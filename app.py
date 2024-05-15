@@ -4,11 +4,12 @@ import openai
 from datetime import datetime, timedelta
 
 def transcribe_audio(audio_file, assemblyai_api_key):
-    aai.settings.api_key = assemblyai_api_key
+    # Connect to AssemblyAI using your API key
+    aai.api_key = assemblyai_api_key
 
-    transcriber = aai.Transcriber()
-    config = aai.TranscriptionConfig(speaker_labels=True)
-    transcript = transcriber.transcribe(audio_file, config)
+    # Transcribe the audio file
+    transcript = aai.Transcript.create(audio_url=audio_file)
+
     transcript_text = ""
     for utterance in transcript.utterances:
         # Extract speaker, text, start and end times
@@ -23,16 +24,16 @@ def transcribe_audio(audio_file, assemblyai_api_key):
         end_minutes = int(end_time // 60)
         end_seconds = end_time % 60
 
-        # Ensure consistent formatting across start and end times
-        timestamp_format = "{:02d}:{:02d}".format  # Use f-string alternative (optional)
+        # Consistent formatting using f-strings
+        timestamp_format = "{:02d}:{:02d}"  # Format string for minutes and seconds
 
-        timestamp = f"[{timestamp_format(start_minutes)}:{start_seconds:02d} - {timestamp_format(end_minutes)}:{end_seconds:02d}]"
-
+        timestamp = f"[{timestamp_format.format(start_minutes, start_seconds)} - {timestamp_format.format(end_minutes, end_seconds)}]"
 
         # Prepend timestamp and combine
         transcript_text += f"{timestamp} Speaker {speaker}: {text}\n"
 
     return transcript_text
+
 
 
 def main():
