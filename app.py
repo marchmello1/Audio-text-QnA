@@ -7,8 +7,8 @@ def transcribe_audio(audio_file, assemblyai_api_key):
     # Connect to AssemblyAI using your API key
     aai.api_key = assemblyai_api_key
 
-    # Transcribe the audio file
-    transcript = aai.Transcript.create(audio_url=audio_file)
+    # Transcribe the audio file (using transcribe method)
+    transcript = aai.Transcriber().transcribe(audio_file)
 
     transcript_text = ""
     for utterance in transcript.utterances:
