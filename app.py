@@ -7,20 +7,21 @@ def transcribe_audio(audio_file, assemblyai_api_key):
     # ... (existing code)
 
     transcript_text = ""
-    start_time = datetime.now()  # Initialize start time
-
     for utterance in transcript.utterances:
-        # ... (extract speaker and text)
+        # Extract speaker, text, start and end times
+        speaker = utterance.speaker
+        text = utterance.text
+        start_time = utterance.start / 1000  # Convert milliseconds to seconds
+        end_time = utterance.end / 1000
 
-        elapsed_time = datetime.now() - start_time
-        timestamp = elapsed_time.strftime('[%H:%M:%S]')  # Customize format
+        # Build timestamp string (customize format as needed)
+        timestamp = f"[{start_time:.2f} - {end_time:.2f}]"
 
         # Prepend timestamp and combine
         transcript_text += f"{timestamp} Speaker {speaker}: {text}\n"
 
-        start_time = datetime.now()  # Update start time for next utterance
-
     return transcript_text
+
 
 def main():
     st.title("Audio Transcription and Q&A App")
