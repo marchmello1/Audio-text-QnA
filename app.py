@@ -22,7 +22,11 @@ def transcribe_audio(audio_file, assemblyai_api_key):
         start_seconds = start_time % 60
         end_minutes = int(end_time // 60)
         end_seconds = end_time % 60
-        timestamp = f"[{start_minutes:02d}:{start_seconds:02d} - {end_minutes:02d}:{end_seconds:02d}]"
+
+        # Ensure consistent formatting across start and end times
+        timestamp_format = "{:02d}:{:02d}".format  # Use f-string alternative (optional)
+
+        timestamp = f"[{timestamp_format(start_minutes)}:{start_seconds:02d} - {timestamp_format(end_minutes)}:{end_seconds:02d}]"
 
         # Prepend timestamp and combine
         transcript_text += f"{timestamp} Speaker {speaker}: {text}\n"
