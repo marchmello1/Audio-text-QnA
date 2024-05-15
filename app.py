@@ -1,32 +1,26 @@
 import streamlit as st
 import assemblyai as aai
 import openai
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def transcribe_audio(audio_file, assemblyai_api_key):
-    # Set up AssemblyAI API key
-    aai.settings.api_key = assemblyai_api_key
-
-    transcriber = aai.Transcriber()
-    config = aai.TranscriptionConfig(speaker_labels=True)
-    transcript = transcriber.transcribe(audio_file, config)
+    # ... (existing code)
 
     transcript_text = ""
-    start_time = datetime.now()  # Initialize start time for manual timestamps
+    start_time = datetime.now()  # Initialize start time
 
     for utterance in transcript.utterances:
-        # Extract speaker and text
-        speaker = utterance.speaker
-        text = utterance.text
+        # ... (extract speaker and text)
 
-        # Calculate elapsed time for timestamp (assuming no time information provided)
         elapsed_time = datetime.now() - start_time
-        timestamp = elapsed_time.strftime('[%H:%M:%S]')  # Customize format as needed
+        timestamp = elapsed_time.strftime('[%H:%M:%S]')  # Customize format
 
         # Prepend timestamp and combine
         transcript_text += f"{timestamp} Speaker {speaker}: {text}\n"
 
-        start_time = datetime.now()
+        start_time = datetime.now()  # Update start time for next utterance
+
+    return transcript_text
 
 def main():
     st.title("Audio Transcription and Q&A App")
