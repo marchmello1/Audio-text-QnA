@@ -1,7 +1,6 @@
 import streamlit as st
 import assemblyai as aai
 import openai
-
 def transcribe_audio(audio_file, assemblyai_api_key):
     # Set up AssemblyAI API key
     aai.settings.api_key = assemblyai_api_key
@@ -17,7 +16,7 @@ def transcribe_audio(audio_file, assemblyai_api_key):
     transcript_with_timestamps = ""
     for utterance in transcript.utterances:
         # Calculate duration of the current utterance
-        duration = utterance.end_time - utterance.start_time
+        duration = utterance.end - utterance.start
         # Update current time
         current_time += duration
         # Format timestamp as HH:MM:SS
@@ -27,11 +26,6 @@ def transcribe_audio(audio_file, assemblyai_api_key):
         transcript_with_timestamps += f"[{timestamp}] Speaker {utterance.speaker}: {utterance.text}\n"
     
     return transcript_with_timestamps
-
-
-
-
-
 
 def main():
     st.title("Audio Transcription and Q&A App")
