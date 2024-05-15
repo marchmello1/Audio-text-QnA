@@ -45,9 +45,9 @@ def main():
     assemblyai_api_key = config["assemblyai"]
     openai_api_key = config["openai"]
 
-    # Initialize session state
-    if "transcript" not in st.session_state:
-        st.session_state.transcript = None
+    # Initialize session state to store previous questions and answers
+    if "qna_history" not in st.session_state:
+        st.session_state.qna_history = []
 
     # Upload audio file
     audio_file = st.file_uploader("Upload MP3 audio file", type=["mp3"])
@@ -57,12 +57,11 @@ def main():
         st.audio(audio_file, format='audio/mp3')
 
         # Transcribe the audio file
-        if st.session_state.transcript is None:
-            st.session_state.transcript = transcribe_audio(audio_file, assemblyai_api_key)
+        transcript_text = transcribe_audio(audio_file, assemblyai_api_key)
 
         # Display transcript
         st.subheader("Transcript:")
-        st.write(st.session_state.transcript)
+        st.write(transcript_text)
 
         # Ask the user for a question
         question = st.text_input("Enter your question:")
@@ -76,8 +75,9 @@ def main():
 
             messages = [{"role": "system", "content": system_message}]
 
-            # Add user question as prompt
-            messages.append({"role": "user", "content": question})
+            # Add user question and transcript as prompt
+            prompt = f"{question}\n{transcript_text}"
+            messages.append({"role": "user", "content": prompt})
 
             # Call OpenAI's ChatGPT model
             response = openai.ChatCompletion.create(
@@ -87,9 +87,19 @@ def main():
                 api_key=openai_api_key
             )
 
+            # Store the question and answer in session state
+            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
+
             # Display the response
             st.subheader("Answer:")
             st.write(response["choices"][0]["message"]["content"])
+
+    # Display previous questions and answers
+    st.subheader("Previous Q&A:")
+    for item in st.session_state.qna_history:
+        st.write(f"Question: {item['question']}")
+        st.write(f"Answer: {item['answer']}")
+        st.write("---")
 
 if __name__ == "__main__":
     main()
