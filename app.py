@@ -14,7 +14,14 @@ def transcribe_audio(audio_file, assemblyai_api_key):
     
     # Generate transcript with timestamps in minutes
     transcript_with_timestamps = ""
+    current_speaker = None
     for utterance in transcript.utterances:
+        # Check if the speaker has changed
+        if utterance.speaker != current_speaker:
+            # Start a new line for the new speaker
+            transcript_with_timestamps += "\n"
+            current_speaker = utterance.speaker
+        
         # Calculate duration of the current utterance in minutes
         duration_minutes = (utterance.end - utterance.start) / 60000  # Convert duration to minutes
         # Format timestamp as MM:SS
@@ -27,6 +34,7 @@ def transcribe_audio(audio_file, assemblyai_api_key):
         current_time += duration_minutes
     
     return transcript_with_timestamps
+
 
 
 
