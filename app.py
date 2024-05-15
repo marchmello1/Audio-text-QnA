@@ -43,6 +43,10 @@ def main():
     assemblyai_api_key = config["assemblyai"]
     openai_api_key = config["openai"]
 
+    # Initialize session state to store previous questions and answers
+    if "qna_history" not in st.session_state:
+        st.session_state.qna_history = []
+
     # Upload audio file
     audio_file = st.file_uploader("Upload MP3 audio file", type=["mp3"])
 
@@ -71,7 +75,7 @@ def main():
 
             # Add user question and transcript as prompt
             prompt = f"{question}\n{transcript_text}"
-            messages.append({"role": "user", "content": question})  # Display user's question
+            messages.append({"role": "user", "content": prompt})
 
             # Call OpenAI's ChatGPT model
             response = openai.ChatCompletion.create(
@@ -81,17 +85,19 @@ def main():
                 api_key=openai_api_key
             )
 
+            # Store the question and answer in session state
+            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
+
             # Display the response
-            st.subheader("Q&A Chat:")
-            # Display user's question
-            st.write("You:", question)
-            # Display model's answer
-            st.write("Model:", response["choices"][0]["message"]["content"])
+            st.subheader("Answer:")
+            st.write(response["choices"][0]["message"]["content"])
+
+    # Display previous questions and answers
+    st.subheader("Previous Q&A:")
+    for item in st.session_state.qna_history:
+        st.write(f"Question: {item['question']}")
+        st.write(f"Answer: {item['answer']}")
+        st.write("---")
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
