@@ -67,18 +67,17 @@ def main():
                 api_key=openai_api_key
             )
 
+            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
+
             st.subheader("Answer:")
             st.write(response["choices"][0]["message"]["content"])
 
-            # Display previous question and answer
-            if len(st.session_state.qna_history) >= 1:
+            if len(st.session_state.qna_history) >= 2:
                 st.subheader("Previous Q&A:")
-                previous_qna = st.session_state.qna_history[-1]
-                st.write(f"Question: {previous_qna['question']}")
-                st.write(f"Answer: {previous_qna['answer']}")
-                st.write("---")
-
-            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
+                for item in st.session_state.qna_history:
+                    st.write(f"Question: {item['question']}")
+                    st.write(f"Answer: {item['answer']}")
+                    st.write("---")
 
 if __name__ == "__main__":
     main()
