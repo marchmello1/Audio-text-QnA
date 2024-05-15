@@ -12,20 +12,22 @@ def transcribe_audio(audio_file, assemblyai_api_key):
     # Initialize timestamp
     current_time = 0
     
-    # Generate transcript with timestamps
+    # Generate transcript with timestamps in minutes
     transcript_with_timestamps = ""
     for utterance in transcript.utterances:
-        # Calculate duration of the current utterance
-        duration = utterance.end - utterance.start
+        # Calculate duration of the current utterance in minutes
+        duration_minutes = (utterance.end - utterance.start) / 60
         # Update current time
-        current_time += duration
-        # Format timestamp as HH:MM:SS
-        timestamp = str(current_time).split('.')[0]  # Convert to string and remove milliseconds
-        timestamp = ":".join(timestamp.zfill(8)[i:i+2] for i in range(0, 8, 2))  # Format as HH:MM:SS
+        current_time += duration_minutes
+        # Format timestamp as MM:SS
+        minutes = int(current_time)
+        seconds = int((current_time - minutes) * 60)
+        timestamp = f"{minutes:02d}:{seconds:02d}"
         # Append timestamp and text to transcript
         transcript_with_timestamps += f"[{timestamp}] Speaker {utterance.speaker}: {utterance.text}\n"
     
     return transcript_with_timestamps
+
 
 def main():
     st.title("Audio Transcription and Q&A App")
