@@ -9,14 +9,14 @@ def transcribe_audio(audio_file, assemblyai_api_key):
     config = aai.TranscriptionConfig(speaker_labels=True)
     transcript = transcriber.transcribe(audio_file, config)
     
-    # Initialize timestamp with the start time of the first utterance
-    current_time = transcript.utterances[0].start / 60  # Convert start time to minutes
+    # Initialize timestamp with the start time of the first utterance in minutes
+    current_time = transcript.utterances[0].start / 60000  # Convert start time to minutes
     
     # Generate transcript with timestamps in minutes
     transcript_with_timestamps = ""
     for utterance in transcript.utterances:
         # Calculate duration of the current utterance in minutes
-        duration_minutes = (utterance.end - utterance.start) / 60
+        duration_minutes = (utterance.end - utterance.start) / 60000  # Convert duration to minutes
         # Format timestamp as MM:SS
         minutes = int(current_time)
         seconds = int((current_time - minutes) * 60)
