@@ -2,12 +2,8 @@ import streamlit as st
 import assemblyai as aai
 import openai
 
-# Set up AssemblyAI and OpenAI API keys
-assemblyai_api_key = st.secrets["api_keys"]["assemblyai"]
-openai_api_key = st.secrets["api_keys"]["openai"]
-
-def transcribe_audio(audio_file):
-    transcriber = aai.Transcriber()
+def transcribe_audio(audio_file, assemblyai_api_key):
+    transcriber = aai.Transcriber(api_key=assemblyai_api_key)
     config = aai.TranscriptionConfig(speaker_labels=True)
     transcript = transcriber.transcribe(audio_file, config)
     transcript_text = "\n".join([f"Speaker {utterance.speaker}: {utterance.text}\n" for utterance in transcript.utterances])
@@ -17,6 +13,11 @@ def main():
     st.title("Audio Transcription and Q&A App")
     st.write("Upload your MP3 audio file and ask a question. The app will transcribe the audio and answer your question based on the transcript.")
 
+    # Load API keys from config.toml
+    config = st.secrets["api_keys"]
+    assemblyai_api_key = config["assemblyai"]
+    openai_api_key = config["openai"]
+
     # Upload audio file
     audio_file = st.file_uploader("Upload MP3 audio file", type=["mp3"])
 
@@ -25,7 +26,7 @@ def main():
         st.audio(audio_file, format='audio/mp3')
 
         # Transcribe the audio file
-        transcript_text = transcribe_audio(audio_file)
+        transcript_text = transcribe_audio(audio_file, assemblyai_api_key)
 
         # Display transcript
         st.subheader("Transcript:")
@@ -49,9 +50,10 @@ def main():
 
             # Call OpenAI's ChatGPT model
             response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-0125",
+                model="gpt-3.5-turbo",
                 messages=messages,
-                temperature=0
+                temperature=0,
+                api_key=openai_api_key
             )
 
             # Display the response
