@@ -1,6 +1,7 @@
 import streamlit as st
 import assemblyai as aai
 import openai
+from datetime import datetime
 
 def transcribe_audio(audio_file, assemblyai_api_key):
     # Set up AssemblyAI API key
