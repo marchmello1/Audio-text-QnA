@@ -1,33 +1,3 @@
-```python
-import streamlit as st
-import assemblyai as aai
-import openai
-
-def transcribe_audio(audio_file, assemblyai_api_key):
-    aai.settings.api_key = assemblyai_api_key
-    
-    transcriber = aai.Transcriber()
-    config = aai.TranscriptionConfig(speaker_labels=True)
-    transcript = transcriber.transcribe(audio_file, config)
-    
-    current_time = transcript.utterances[0].start / 60000  
-    
-    transcript_with_timestamps = ""
-    current_speaker = None
-    for utterance in transcript.utterances:
-        if utterance.speaker != current_speaker:
-            transcript_with_timestamps += "\n"
-            current_speaker = utterance.speaker
-        
-        duration_minutes = (utterance.end - utterance.start) / 60000  
-        minutes = int(current_time)
-        seconds = int((current_time - minutes) * 60)
-        timestamp = f"{minutes:02d}:{seconds:02d}"
-        transcript_with_timestamps += f"[{timestamp}] Speaker {utterance.speaker}: {utterance.text}\n"
-        current_time += duration_minutes
-    
-    return transcript_with_timestamps
-
 def main():
     st.title("Audio Transcription and Q&A App")
     st.write("Upload your MP3 audio file and ask a question. The app will transcribe the audio and answer your question based on the transcript.")
@@ -68,18 +38,18 @@ def main():
                 api_key=openai_api_key
             )
 
-            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
-
             st.subheader("Answer:")
             st.write(response["choices"][0]["message"]["content"])
 
-            if len(st.session_state.qna_history) >= 2:
+            # Display previous question and answer
+            if len(st.session_state.qna_history) >= 1:
                 st.subheader("Previous Q&A:")
-                for item in st.session_state.qna_history:
-                    st.write(f"Question: {item['question']}")
-                    st.write(f"Answer: {item['answer']}")
-                    st.write("---")
+                previous_qna = st.session_state.qna_history[-1]
+                st.write(f"Question: {previous_qna['question']}")
+                st.write(f"Answer: {previous_qna['answer']}")
+                st.write("---")
+
+            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
 
 if __name__ == "__main__":
     main()
-```
