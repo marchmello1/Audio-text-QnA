@@ -1,38 +1,35 @@
 import streamlit as st
 import assemblyai as aai
 import openai
-from datetime import datetime, timedelta
 
 def transcribe_audio(audio_file, assemblyai_api_key):
-    # Connect to AssemblyAI using your API key
-    aai.api_key = assemblyai_api_key
-
-    # Transcribe the audio file (using transcribe method)
-    transcript = aai.Transcriber().transcribe(audio_file)
-
-    transcript_text = ""
+    # Set up AssemblyAI API key
+    aai.settings.api_key = assemblyai_api_key
+    
+    transcriber = aai.Transcriber()
+    config = aai.TranscriptionConfig(speaker_labels=True)
+    transcript = transcriber.transcribe(audio_file, config)
+    
+    # Initialize timestamp
+    current_time = 0
+    
+    # Generate transcript with timestamps
+    transcript_with_timestamps = ""
     for utterance in transcript.utterances:
-        # Extract speaker, text, start and end times
-        speaker = utterance.speaker
-        text = utterance.text
-        start_time = utterance.start / 1000  # Convert milliseconds to seconds
-        end_time = utterance.end / 1000
+        # Calculate duration of the current utterance
+        duration = utterance.end_time - utterance.start_time
+        # Update current time
+        current_time += duration
+        # Format timestamp as HH:MM:SS
+        timestamp = str(current_time).split('.')[0]  # Convert to string and remove milliseconds
+        timestamp = ":".join(timestamp.zfill(8)[i:i+2] for i in range(0, 8, 2))  # Format as HH:MM:SS
+        # Append timestamp and text to transcript
+        transcript_with_timestamps += f"[{timestamp}] Speaker {utterance.speaker}: {utterance.text}\n"
+    
+    return transcript_with_timestamps
 
-        # Convert seconds to minutes and format timestamp string (customize format)
-        start_minutes = int(start_time // 60)  # Convert to integer for formatting
-        start_seconds = start_time % 60
-        end_minutes = int(end_time // 60)
-        end_seconds = end_time % 60
 
-        # Consistent formatting using f-strings
-        timestamp_format = "{:02d}:{:02d}"  # Format string for minutes and seconds
 
-        timestamp = f"[{timestamp_format.format(start_minutes, start_seconds)} - {timestamp_format.format(end_minutes, end_seconds)}]"
-
-        # Prepend timestamp and combine
-        transcript_text += f"{timestamp} Speaker {speaker}: {text}\n"
-
-    return transcript_text
 
 
 
