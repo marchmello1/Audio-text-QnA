@@ -34,10 +34,6 @@ def transcribe_audio(audio_file, assemblyai_api_key):
         current_time += duration_minutes
     
     return transcript_with_timestamps
-
-
-
-
 def main():
     st.title("Audio Transcription and Q&A App")
     st.write("Upload your MP3 audio file and ask a question. The app will transcribe the audio and answer your question based on the transcript.")
@@ -75,7 +71,7 @@ def main():
 
             # Add user question and transcript as prompt
             prompt = f"{question}\n{transcript_text}"
-            messages.append({"role": "user", "content": prompt})
+            messages.append({"role": "user", "content": question})  # Display user's question
 
             # Call OpenAI's ChatGPT model
             response = openai.ChatCompletion.create(
@@ -86,8 +82,16 @@ def main():
             )
 
             # Display the response
-            st.subheader("Answer:")
-            st.write(response["choices"][0]["message"]["content"])
+            st.subheader("Q&A Chat:")
+            # Display user's question
+            st.write("You:", question)
+            # Display model's answer
+            st.write("Model:", response["choices"][0]["message"]["content"])
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
