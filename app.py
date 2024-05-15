@@ -3,11 +3,15 @@ import assemblyai as aai
 import openai
 
 def transcribe_audio(audio_file, assemblyai_api_key):
-    transcriber = aai.Transcriber(api_key=assemblyai_api_key)
+    # Set up AssemblyAI API key
+    aai.settings.api_key = assemblyai_api_key
+    
+    transcriber = aai.Transcriber()
     config = aai.TranscriptionConfig(speaker_labels=True)
     transcript = transcriber.transcribe(audio_file, config)
     transcript_text = "\n".join([f"Speaker {utterance.speaker}: {utterance.text}\n" for utterance in transcript.utterances])
     return transcript_text
+
 
 def main():
     st.title("Audio Transcription and Q&A App")
