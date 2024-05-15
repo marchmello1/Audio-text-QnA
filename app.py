@@ -8,7 +8,7 @@ def transcribe_audio(audio_file, assemblyai_api_key):
 
     transcriber = aai.Transcriber()
     config = aai.TranscriptionConfig(speaker_labels=True)
-    transcript = transcriber.transcribe(audio_file, config
+    transcript = transcriber.transcribe(audio_file, config)
     transcript_text = ""
     for utterance in transcript.utterances:
         # Extract speaker, text, start and end times
