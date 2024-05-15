@@ -94,12 +94,13 @@ def main():
             st.subheader("Answer:")
             st.write(response["choices"][0]["message"]["content"])
 
-    # Display previous questions and answers
-    st.subheader("Previous Q&A:")
-    for item in st.session_state.qna_history:
-        st.write(f"Question: {item['question']}")
-        st.write(f"Answer: {item['answer']}")
-        st.write("---")
+            # Display previous questions and answers after the second question is asked
+            if len(st.session_state.qna_history) >= 2:
+                st.subheader("Previous Q&A:")
+                for item in st.session_state.qna_history:
+                    st.write(f"Question: {item['question']}")
+                    st.write(f"Answer: {item['answer']}")
+                    st.write("---")
 
 if __name__ == "__main__":
     main()
