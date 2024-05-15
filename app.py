@@ -1,6 +1,7 @@
 import streamlit as st
 import assemblyai as aai
 import openai
+
 def transcribe_audio(audio_file, assemblyai_api_key):
     # Set up AssemblyAI API key
     aai.settings.api_key = assemblyai_api_key
@@ -34,6 +35,7 @@ def transcribe_audio(audio_file, assemblyai_api_key):
         current_time += duration_minutes
     
     return transcript_with_timestamps
+
 def main():
     st.title("Audio Transcription and Q&A App")
     st.write("Upload your MP3 audio file and ask a question. The app will transcribe the audio and answer your question based on the transcript.")
@@ -43,6 +45,10 @@ def main():
     assemblyai_api_key = config["assemblyai"]
     openai_api_key = config["openai"]
 
+    # Initialize session state
+    if "transcript" not in st.session_state:
+        st.session_state.transcript = None
+
     # Upload audio file
     audio_file = st.file_uploader("Upload MP3 audio file", type=["mp3"])
 
@@ -51,11 +57,12 @@ def main():
         st.audio(audio_file, format='audio/mp3')
 
         # Transcribe the audio file
-        transcript_text = transcribe_audio(audio_file, assemblyai_api_key)
+        if st.session_state.transcript is None:
+            st.session_state.transcript = transcribe_audio(audio_file, assemblyai_api_key)
 
         # Display transcript
         st.subheader("Transcript:")
-        st.write(transcript_text)
+        st.write(st.session_state.transcript)
 
         # Ask the user for a question
         question = st.text_input("Enter your question:")
@@ -72,13 +79,12 @@ def main():
             # Add user question as prompt
             messages.append({"role": "user", "content": question})
 
-            # Call OpenAI's ChatGPT model with transcript as context
+            # Call OpenAI's ChatGPT model
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=messages,
                 temperature=0,
-                api_key=openai_api_key,
-                context=transcript_text  # Pass transcript as context
+                api_key=openai_api_key
             )
 
             # Display the response
