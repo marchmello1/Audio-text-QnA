@@ -21,10 +21,10 @@ This is a Streamlit web application that allows users to upload an MP3 audio fil
 4. Create a `secrets.toml` file in the root directory with the following structure:
    ```toml
    [api_keys]
-   assemblyai = "YOUR_ASSEMBLYAI_API_KEY"
-   together = "YOUR_TOGETHER_API_KEY"
+   assemblyai = "ASSEMBLYAI"
+   together = "TOGETHER_API_KEY"
    ```
-   Replace `"YOUR_ASSEMBLYAI_API_KEY"` and `"YOUR_TOGETHER_API_KEY"` with your actual API keys.
+   Replace `"ASSEMBLYAI"` and `"TOGETHER_API_KEY"` with your actual API keys.
 
 ## Usage
 
