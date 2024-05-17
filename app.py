@@ -1,6 +1,6 @@
 import streamlit as st
 import assemblyai as aai
-import openai
+from together import Together
 
 def transcribe_audio(audio_file, assemblyai_api_key):
     aai.settings.api_key = assemblyai_api_key
@@ -33,7 +33,7 @@ def main():
 
     config = st.secrets["api_keys"]
     assemblyai_api_key = config["assemblyai"]
-    openai_api_key = config["openai"]
+    together_api_key =  config["together_api_key"]
 
     if "qna_history" not in st.session_state:
         st.session_state.qna_history = []
@@ -60,17 +60,21 @@ def main():
             prompt = f"{question}\n{transcript_text}"
             messages.append({"role": "user", "content": prompt})
 
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                temperature=0,
-                api_key=openai_api_key
-            )
+            together_client = Together(api_key=together_api_key)
+            try:
+                response = together_client.chat.completions.create(
+                    model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+                    messages=messages,
+                )
+                answer = response.choices[0].message.content
+            except Exception as e:
+                answer = f"Error: {e}"
+                print(f"Error occurred with Together.io: {e}")
 
-            st.session_state.qna_history.append({"question": question, "answer": response["choices"][0]["message"]["content"]})
+            st.session_state.qna_history.append({"question": question, "answer": answer})
 
             st.subheader("Answer:")
-            st.write(response["choices"][0]["message"]["content"])
+            st.write(answer)
 
             if len(st.session_state.qna_history) >= 2:
                 st.subheader("Previous Q&A:")
